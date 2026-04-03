@@ -148,6 +148,9 @@ const MockData = {
 
 // ── INITIALIZATION ──
 document.addEventListener('DOMContentLoaded', () => {
+  // Show auth page first, hide main app
+  document.getElementById('authPage').style.display = 'block';
+  document.getElementById('mainApp').style.display = 'none';
   initApp();
 });
 
