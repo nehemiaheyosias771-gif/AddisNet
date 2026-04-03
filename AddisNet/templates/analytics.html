@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Analytics{% endblock %}
+{% block content %}
+<div class="container">
+    <h2><i class="fas fa-chart-line"></i> Analytics Dashboard</h2>
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card glass-card mb-4">
+                <div class="card-header">Issues by Category</div>
+                <div class="card-body"><canvas id="categoryChart"></canvas></div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card glass-card mb-4">
+                <div class="card-header">Issues by Severity</div>
+                <div class="card-body"><canvas id="severityChart"></canvas></div>
+            </div>
+        </div>
+    </div>
+    <div class="alert alert-info">
+        <strong>Total Issues:</strong> {{ total_issues }} | <strong>Resolution Rate:</strong> {{ resolved_rate }}%
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+new Chart(document.getElementById('categoryChart'), {
+    type: 'bar',
+    data: {
+        labels: {{ issues_by_category|safe }},
+        datasets: [{ label: 'Issues', data: [10, 20, 15, 8, 12], backgroundColor: '#0d6efd' }]
+    }
+});
+new Chart(document.getElementById('severityChart'), {
+    type: 'pie',
+    data: {
+        labels: ['Low', 'Medium', 'High', 'Critical'],
+        datasets: [{ data: [30, 40, 20, 10], backgroundColor: ['#198754', '#0d6efd', '#ffc107', '#dc3545'] }]
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}Live Map{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <h2 class="mb-4"><i class="fas fa-map-marked-alt"></i> Issue Map - Addis Ababa</h2>
+    <div class="row">
+        <div class="col-md-10">
+            <div id="map"></div>
+        </div>
+        <div class="col-md-2">
+            <div class="card glass-card mb-3">
+                <div class="card-body">
+                    <h6>Filters</h6>
+                    <select class="form-select mb-2" id="categoryFilter">
+                        <option value="">All Categories</option>
+                        {% for cat in categories %}<option value="{{ cat.0 }}">{{ cat.1 }}</option>{% endfor %}
+                    </select>
+                    <button class="btn btn-primary w-100" onclick="applyFilter()">Apply</button>
+                </div>
+            </div>
+            <div class="card glass-card">
+                <div class="card-body">
+                    <h6>Legend</h6>
+                    <span class="badge bg-danger">Critical</span>
+                    <span class="badge bg-warning">High</span>
+                    <span class="badge bg-primary">Medium</span>
+                    <span class="badge bg-success">Low</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+const map = initMap('map', 9.0320, 38.7469, 12);
+loadIssuesOnMap(map);
+
+function applyFilter() {
+    const category = document.getElementById('categoryFilter').value;
+    window.location.href = '?category=' + category;
+}
+</script>
+{% endblock %}

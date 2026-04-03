@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Emergency Alerts{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between mb-4">
+        <h2><i class="fas fa-bell text-danger"></i> Emergency Alerts</h2>
+        {% if user.role in 'government,admin,volunteer' %}
+        <a href="{% url 'create_emergency_alert' %}" class="btn btn-danger">Create Alert</a>
+        {% endif %}
+    </div>
+    {% for alert in active_alerts %}
+    <div class="alert alert-danger glass-card">
+        <h4>{{ alert.title }}</h4>
+        <p>{{ alert.description }}</p>
+        <span class="badge bg-{{ alert.get_priority_display|lower }}">{{ alert.get_priority_display }}</span>
+        <form method="post" action="{% url 'acknowledge_alert' alert.id %}" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-outline-dark">Acknowledge</button>
+        </form>
+    </div>
+    {% empty %}
+    <div class="alert alert-success">No active emergency alerts.</div>
+    {% endfor %}
+</div>
+{% endblock %}
