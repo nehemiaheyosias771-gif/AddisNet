@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Community Board{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between mb-4">
+        <h2><i class="fas fa-users"></i> Community Board</h2>
+        <a href="{% url 'create_post' %}" class="btn btn-primary">Create Post</a>
+    </div>
+    {% for post in page_obj %}
+    <div class="card glass-card mb-3">
+        <div class="card-body">
+            <h5>{{ post.title }}</h5>
+            <span class="badge bg-info">{{ post.get_type_display }}</span>
+            <p class="mt-2">{{ post.description|truncatewords:30 }}</p>
+            <small>By {{ post.user.username }} | {{ post.created_at|timesince }} ago | <i class="fas fa-arrow-up"></i> {{ post.upvotes }}</small>
+            <a href="{% url 'post_detail' post.id %}" class="btn btn-sm btn-outline-primary mt-2">Read More</a>
+        </div>
+    </div>
+    {% empty %}
+    <p>No posts yet. Be the first!</p>
+    {% endfor %}
+    {% if page_obj.has_other_pages %}
+    <nav>
+        <ul class="pagination">
+            {% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Prev</a></li>{% endif %}
+            <li class="page-item active"><span class="page-link">{{ page_obj.number }}</span></li>
+            {% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>{% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Participatory Budgeting{% endblock %}
+{% block content %}
+<div class="container">
+    <h2><i class="fas fa-vote-yea"></i> Participatory Budgeting</h2>
+    <p class="lead">Vote on which issues should receive funding priority. Total Budget: {{ total_budget|floatformat:0 }} ETB</p>
+    {% for issue in votable_issues %}
+    <div class="card glass-card mb-3 {% if issue.id in voted_issue_ids %}border-success{% endif %}">
+        <div class="card-body">
+            <h5>{{ issue.title }}</h5>
+            <p>{{ issue.description|truncatewords:20 }}</p>
+            <span class="badge bg-{{ issue.get_severity_display|lower }}">{{ issue.get_severity_display }}</span>
+            <span class="badge bg-info">{{ issue.vote_count }} votes</span>
+            {% if issue.id not in voted_issue_ids %}
+            <form method="post" action="{% url 'cast_budget_vote' issue.id %}" class="mt-2">
+                {% csrf_token %}
+                <input type="text" name="justification" class="form-control mb-2" placeholder="Why should this be funded?">
+                <button type="submit" class="btn btn-success">Vote</button>
+            </form>
+            {% else %}
+            <span class="text-success"><i class="fas fa-check"></i> You voted on this</span>
+            {% endif %}
+        </div>
+    </div>
+    {% empty %}
+    <p>No issues available for voting.</p>
+    {% endfor %}
+</div>
+{% endblock %}

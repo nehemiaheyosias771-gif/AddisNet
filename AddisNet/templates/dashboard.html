@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="container">
+    <h1 class="mb-4"><i class="fas fa-tachometer-alt"></i> Dashboard</h1>
+    
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card glass-card border-primary h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-exclamation-triangle fa-3x text-primary mb-3"></i>
+                    <h3>{{ total_issues }}</h3>
+                    <p class="text-muted">Total Issues</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card glass-card border-warning h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-clock fa-3x text-warning mb-3"></i>
+                    <h3>{{ active_issues }}</h3>
+                    <p class="text-muted">Active Issues</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card glass-card border-success h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                    <h3>{{ resolved_issues }}</h3>
+                    <p class="text-muted">Resolved</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card glass-card border-info h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-users fa-3x text-info mb-3"></i>
+                    <h3>{{ active_users }}</h3>
+                    <p class="text-muted">Active Users</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Emergency Alerts -->
+    {% if active_emergencies %}
+    <div class="alert alert-danger mb-4">
+        <h5><i class="fas fa-bell"></i> Active Emergency Alerts</h5>
+        {% for alert in active_emergencies %}
+        <div class="alert alert-danger mt-2">
+            <strong>{{ alert.get_priority_display }}:</strong> {{ alert.title }} - {{ alert.location_name }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <!-- Recent Issues -->
+        <div class="col-md-8">
+            <div class="card glass-card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5><i class="fas fa-list"></i> Recent Issues</h5>
+                </div>
+                <div class="card-body">
+                    {% for issue in recent_issues %}
+                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                        <div>
+                            <a href="{% url 'issue_detail' issue.id %}" class="text-decoration-none">{{ issue.title }}</a>
+                            <span class="badge bg-{{ issue.get_severity_display|lower }}">{{ issue.get_severity_display }}</span>
+                        </div>
+                        <small class="text-muted">{{ issue.created_at|timesince }} ago</small>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">No issues reported yet.</p>
+                    {% endfor %}
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'issue_list' %}" class="btn btn-outline-primary btn-sm">View All Issues</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Issues by Category -->
+        <div class="col-md-4">
+            <div class="card glass-card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5><i class="fas fa-chart-pie"></i> By Category</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="card glass-card">
+                <div class="card-header bg-info text-white">
+                    <h5><i class="fas fa-lightbulb"></i> Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <a href="{% url 'report_issue' %}" class="btn btn-primary w-100 mb-2">
+                        <i class="fas fa-plus"></i> Report Issue
+                    </a>
+                    <a href="{% url 'map' %}" class="btn btn-outline-primary w-100 mb-2">
+                        <i class="fas fa-map"></i> View Map
+                    </a>
+                    <a href="{% url 'community' %}" class="btn btn-outline-success w-100">
+                        <i class="fas fa-users"></i> Community
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const ctx = document.getElementById('categoryChart').getContext('2d');
+new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+        labels: [{% for cat in issues_by_category %}'{{ cat.category }}',{% endfor %}],
+        datasets: [{
+            data: [{% for cat in issues_by_category %}{{ cat.count }},{% endfor %}],
+            backgroundColor: ['#dc3545', '#ffc107', '#0d6efd', '#198754', '#6f42c1']
+        }]
+    },
+    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+});
+</script>
+{% endblock %}
